@@ -41,21 +41,30 @@ jobs:
       - name: Push Docker image to ECR
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
-     
-      # Step 7: Update ECS Task Definition
-      - name: Update ECS Task Definition
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}  
+      
+      # Step 7: Download current ECS task definition
+      - name: Download task definition
         run: |
-          # Get the current task definition JSON (using family name)
-          CURRENT_TASK_DEF=$(aws ecs describe-task-definition --task-definition APITaskDefFam)
+          aws ecs describe-task-definition --task-definition APITaskDefFam --query taskDefinition > taskdefinition.json
 
-          echo '.taskDefinition.containerDefinitions[0].image
+      # Step 8: Render the new task definition with the updated image
+      - name: new image in ECS taskdefinition
+        id: demo
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: taskdefinition.json
+          container-name: APIContainer
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
 
-          # Extract the container definition and update the image to the latest image
-          UPDATED_TASK_DEF=$(echo $CURRENT_TASK_DEF | jq '.taskDefinition.containerDefinitions[0].image = "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}"')
+      # Step 9: Update the task definition file
+      - name: updating task-definition file
+        run: cat ${{ steps.demo.outputs.task-definition }} > taskdefinition.json
 
-          # Register the updated task definition as a new revision
+      # Step 10: Register the updated ECS task definition
+      - name: Register ECS task definition
+        run: |
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions "$UPDATED_TASK_DEF"
+            --container-definitions file://taskdefinition.json
 
