@@ -62,10 +62,6 @@ jobs:
         run: |
           cat ${{ steps.demo.outputs.task-definition.container-definition }} | jq .
 
-      # Step 9: Update the task definition file
-   #   - name: updating task-definition file
-    #    run: cat ${{ steps.demo.outputs.task-definition }} > taskdefinition.json
-
       - name: Register ECS task definition
         run: |
           aws ecs register-task-definition \
