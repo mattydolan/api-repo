@@ -44,6 +44,9 @@ jobs:
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
      
       # Step 7: Update ECS Task Definition
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Update ECS Task Definition
         run: |
           # Get the current task definition JSON (using family name)
