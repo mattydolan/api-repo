@@ -60,7 +60,7 @@ jobs:
 
       - name: Validate the updated task definition JSON
         run: |
-          cat taskdefinition.json
+          cat taskdefinition.json | jq '.containerDefinitions'
       #    echo "${{ steps.demo.outputs.task-definition }}" | jq '.containerDefinitions'
 
   #    - name: Register ECS task definition
