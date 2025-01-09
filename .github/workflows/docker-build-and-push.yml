@@ -58,9 +58,9 @@ jobs:
           image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
 
 
-        - name: Validate the updated task definition JSON
-          run: |
-            echo "${{ steps.demo.outputs.task-definition }}" | jq .
+      - name: Validate the updated task definition JSON
+        run: |
+          echo "${{ steps.demo.outputs.task-definition }}" | jq .
 
 
 
