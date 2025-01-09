@@ -57,6 +57,10 @@ jobs:
           container-name: APIContainer
           image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
 
+
+        echo "${{ steps.demo.outputs.task-definition }}" | jq .
+
+
       # Step 9: Update the task definition file
       - name: updating task-definition file
         run: cat ${{ steps.demo.outputs.task-definition }} > taskdefinition.json
