@@ -71,8 +71,8 @@ jobs:
           # Update the image using jq
           UPDATED_TASK_DEF=$(cat ${{ steps.demo.outputs.task-definition }} | jq '.taskDefinition.containerDefinitions[0].image = "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}"')
           echo $UPDATED_TASK_DEF
-          
+
           # Register the updated task definition
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions "$(echo $UPDATED_TASK_DEF | jq -c '.taskDefinition.containerDefinitions')"
+            --container-definitions "${{ steps.demo.outputs.task-definition | jq '.containerDefinitions' }}"
