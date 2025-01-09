@@ -46,13 +46,13 @@ jobs:
       # Step 7: Update ECS Task Definition with the new image
       - name: Update ECS Task Definition
         run: |
-          # Get the current task definition
-          TASK_DEF_JSON=$(aws ecs describe-task-definitions \
-            --family APITaskDefFam \
-            --status ACTIVE \
-            --query 'taskDefinitionArns[0]' --output text)
+          # Get the current task definition JSON (using family name)
+          CURRENT_TASK_DEF=$(aws ecs describe-task-definition --task-definition APITaskDefFam)
 
-          # Register a new task definition revision with the new image
+          # Extract the container definition and update the image to the latest image
+          UPDATED_TASK_DEF=$(echo $CURRENT_TASK_DEF | jq '.taskDefinition.containerDefinitions[0].image = "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/your-repository-name:${{ github.sha }}"')
+
+          # Register the updated task definition as a new revision
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions "$(aws ecs describe-task-definition --task-definition $TASK_DEF_JSON --query 'taskDefinition.containerDefinitions' --output json | jq '.[0].image = "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}"')"
+            --container-definitions "$UPDATED_TASK_DEF"
