@@ -61,11 +61,12 @@ jobs:
       - name: Validate the updated task definition JSON
         run: |
           cat ${{ steps.demo.outputs.task-definition.container-definition }} | jq .
+          echo "${{ steps.demo.outputs.task-definition }}" | jq '.containerDefinitions'
 
-      - name: Register ECS task definition
-        run: |
-          aws ecs register-task-definition \
-            --family APITaskDefFam \
-            --container-definitions "${{ steps.demo.outputs.task-definition.container-definition | jq '.containerDefinitions' }}"
+  #    - name: Register ECS task definition
+   #     run: |
+    #      aws ecs register-task-definition \
+     #       --family APITaskDefFam \
+      #      --container-definitions "${{ steps.demo.outputs.task-definition.container-definition | jq '.containerDefinitions' }}"
 
           
