@@ -74,4 +74,4 @@ jobs:
           # Register the updated task definition
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions "$(echo $UPDATED_TASK_DEF | jq '.taskDefinition.containerDefinitions')"
+            --container-definitions "$(echo $UPDATED_TASK_DEF | jq -c '.taskDefinition.containerDefinitions')"
