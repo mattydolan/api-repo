@@ -60,7 +60,7 @@ jobs:
 
       - name: Validate the updated task definition JSON
         run: |
-          cat ${{ steps.demo.outputs.task-definition }} | jq .
+          cat ${{ steps.demo.outputs.task-definition.container-definition }} | jq .
 
       # Step 9: Update the task definition file
    #   - name: updating task-definition file
@@ -68,11 +68,8 @@ jobs:
 
       - name: Register ECS task definition
         run: |
-          # Update the image using jq
-          UPDATED_TASK_DEF=$(cat ${{ steps.demo.outputs.task-definition }} | jq '.taskDefinition.containerDefinitions[0].image = "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}"')
-          echo $UPDATED_TASK_DEF
-
-          # Register the updated task definition
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions "${{ steps.demo.outputs.task-definition | jq '.containerDefinitions' }}"
+            --container-definitions "${{ steps.demo.outputs.task-definition.container-definition | jq '.containerDefinitions' }}"
+
+          
