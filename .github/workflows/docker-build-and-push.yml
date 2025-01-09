@@ -60,14 +60,14 @@ jobs:
 
       - name: Validate the updated task definition JSON
         run: |
-          CONTAINER_DEFINITIONS=$(cat taskdefinition.json | jq '.containerDefinitions')
-          echo "$CONTAINER_DEFINITIONS"
+          cat taskdefinition.json | jq '.containerDefinitions' > container.json
+          cat container
 
       - name: Register ECS task definition
         run: |
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions "$CONTAINER_DEFINITIONS"
+            --container-definitions file://container.json
 
 
           
