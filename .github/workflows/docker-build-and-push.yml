@@ -1,0 +1,77 @@
+name: Build, Push Docker Image and Update ECS Task Definition
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your desired branch
+
+jobs:
+  build-and-update-task:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up AWS CLI
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Step 4: Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:latest .
+
+      # Step 5: Tag Docker image
+      - name: Tag Docker image
+        run: |
+          docker tag ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
+
+      # Step 6: Push Docker image to ECR
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}  
+      
+      # Step 7: Download current ECS task definition
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition APITaskDefFam --query taskDefinition > taskdefinition.json
+       
+      # Step 8: Render the new task definition with the updated image
+      - name: new image in ECS taskdefinition
+        id: demo
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: taskdefinition.json
+          container-name: APIContainer
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
+
+      - name: update task definition file
+        run: |
+          cat ${{ steps.demo.outputs.task-definition }} > taskdefinition.json
+          cat taskdefinition.json
+ 
+ #     - name: Validate the updated task definition JSON
+ #       run: |
+ #         cat taskdefinition.json | jq -c > container.json
+ #         cat container.json
+
+      - name: Register ECS Task Definition
+        run: |
+          CONTAINER_DEFINITION=$(echo "${{ steps.demo.outputs.task-definition }}" | jq -c '.containerDefinitions')
+          echo $CONTAINER_DEFINITION
+          
+          aws ecs register-task-definition \
+            --family APITaskDefFam \
+            --container-definitions "$CONTAINER_DEFINITION"
