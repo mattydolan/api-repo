@@ -47,8 +47,7 @@ jobs:
       - name: Download task definition
         run: |
           aws ecs describe-task-definition --task-definition APITaskDefFam --query taskDefinition > taskdefinition.json
-          cat taskdefinition.json
-
+       
       # Step 8: Render the new task definition with the updated image
       - name: new image in ECS taskdefinition
         id: demo
@@ -58,6 +57,10 @@ jobs:
           container-name: APIContainer
           image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
 
+      - name: update task definition file
+        run: |
+          cat ${{ steps.demo.outputs.task-definition }} > taskdefinition.json
+          cat taskdefinition.json
 
       - name: Validate the updated task definition JSON
         run: |
@@ -68,7 +71,7 @@ jobs:
         run: |
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions file://container.json
+            --container-definitions file://taskdefinition.json
 
 
           
