@@ -57,21 +57,8 @@ jobs:
           container-name: APIContainer
           image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/docker-repo:${{ github.sha }}
 
-      - name: update task definition file
-        run: |
-          cat ${{ steps.demo.outputs.task-definition }} > taskdefinition.json
-          cat taskdefinition.json
- 
- #     - name: Validate the updated task definition JSON
- #       run: |
- #         cat taskdefinition.json | jq -c > container.json
- #         cat container.json
-
-      - name: Register ECS Task Definition
-        run: |
-          CONTAINER_DEFINITION="${{ steps.demo.outputs.task-definition }}"
-          echo "$CONTAINER_DEFINITION"
-          
-        #  aws ecs register-task-definition \
-        #    --family APITaskDefFam \
-        #    --container-definitions "$CONTAINER_DEFINITION"
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.demo.outputs.task-definition }}
+          cluster: APICluster
