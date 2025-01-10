@@ -47,6 +47,7 @@ jobs:
       - name: Download task definition
         run: |
           aws ecs describe-task-definition --task-definition APITaskDefFam --query taskDefinition > taskdefinition.json
+          cat taskdefinition.json
 
       # Step 8: Render the new task definition with the updated image
       - name: new image in ECS taskdefinition
