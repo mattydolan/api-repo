@@ -69,7 +69,7 @@ jobs:
 
       - name: Register ECS Task Definition
         run: |
-          CONTAINER_DEFINITION=$(echo "${{ steps.demo.outputs.task-definition }}" | jq -c '.containerDefinitions')
+          CONTAINER_DEFINITION="${{ steps.demo.outputs.task-definition }}"
           echo $CONTAINER_DEFINITION
           
           aws ecs register-task-definition \
