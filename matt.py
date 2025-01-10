@@ -9,7 +9,7 @@ m = r.status_code
 mm = r.json()
 print(mm)
 
-/*
+
 # Create a session using your AWS credentials (or default credentials)
 # session = boto3.Session(
 #    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
