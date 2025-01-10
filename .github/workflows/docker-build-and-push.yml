@@ -61,7 +61,7 @@ jobs:
       - name: Validate the updated task definition JSON
         run: |
           cat taskdefinition.json | jq '.containerDefinitions' > container.json
-          cat container
+          cat container.json
 
       - name: Register ECS task definition
         run: |
