@@ -59,19 +59,19 @@ jobs:
 
       - name: update task definition file
         run: |
-          cat ${{ steps.demo.outputs.task-definition }} | jq '.containerDefinitions' > taskdefinition.json
-          cat taskdefinition.json
-
+          cat ${{ steps.demo.outputs.task-definition }} > taskdefinition.json
+        # cat taskdefinition.json
+ 
       - name: Validate the updated task definition JSON
         run: |
-          cat taskdefinition.json | jq '.containerDefinitions' > container.json
-         # cat container.json
+          cat taskdefinition.json | jq -c > container.json
+          cat container.json
 
       - name: Register ECS task definition
         run: |
           aws ecs register-task-definition \
             --family APITaskDefFam \
-            --container-definitions file://taskdefinition.json
+            --container-definitions file://container.json
 
 
           
