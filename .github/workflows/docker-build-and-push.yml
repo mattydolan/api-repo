@@ -72,6 +72,6 @@ jobs:
           CONTAINER_DEFINITION="${{ steps.demo.outputs.task-definition }}"
           echo $CONTAINER_DEFINITION
           
-          aws ecs register-task-definition \
-            --family APITaskDefFam \
-            --container-definitions "$CONTAINER_DEFINITION"
+        #  aws ecs register-task-definition \
+        #    --family APITaskDefFam \
+        #    --container-definitions "$CONTAINER_DEFINITION"
