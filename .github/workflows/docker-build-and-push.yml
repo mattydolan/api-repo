@@ -67,11 +67,11 @@ jobs:
  #         cat taskdefinition.json | jq -c > container.json
  #         cat container.json
 
-       - name: Register ECS Task Definition
-         run: |
-           CONTAINER_DEFINITION=$(echo "${{ steps.demo.outputs.task-definition }}" | jq -c '.containerDefinitions')
+      - name: Register ECS Task Definition
+        run: |
+          CONTAINER_DEFINITION=$(echo "${{ steps.demo.outputs.task-definition }}" | jq -c '.containerDefinitions')
           
-           aws ecs register-task-definition \
+          aws ecs register-task-definition \
             --family APITaskDefFam \
             --container-definitions "$CONTAINER_DEFINITION"
 
