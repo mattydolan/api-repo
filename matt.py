@@ -19,7 +19,7 @@ print(mm)
 
 
 # Create an S3 client
-s3_client = session.client('s3')
+s3_client = boto3.client('s3')
 
 # List S3 buckets
 response = s3_client.list_buckets()
