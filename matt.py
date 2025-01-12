@@ -8,6 +8,7 @@ r = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
 m = r.status_code
 mm = r.json()
 print(mm)
+print('Hello')
 
 
 # Create a session using your AWS credentials (or default credentials)
