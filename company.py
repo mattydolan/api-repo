@@ -28,16 +28,20 @@ for bucket in response['Buckets']:
 bucket_name = 'mattydolans3bucket'
 local_file_path = 'companies.parquet' 
 
-# Parse the JSON string into a Python object
-data = json.loads(mm)
+# Check if the request was successful (status code 200)
+if r.status_code == 200:
+    # Parse the JSON data into a Python object
+    data = r.json()
 
-# Convert the data to a pandas DataFrame
-df = pd.DataFrame(data)
+    # Convert the data to a pandas DataFrame
+    df = pd.DataFrame(data)
 
-# Write the DataFrame to a Parquet file
-df.to_parquet('company_data.parquet', engine='pyarrow')
+    # Write the DataFrame to a Parquet file
+    df.to_parquet('company_data.parquet', engine='pyarrow')
 
-print("Parquet file created successfully.")
+    print("Parquet file saved successfully.")
+else:
+    print(f"Request failed with status code: {r.status_code}")
 
 try:
     s3_client.upload_file(local_file_path, bucket_name, local_file_path)
