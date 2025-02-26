@@ -26,7 +26,7 @@ for bucket in response['Buckets']:
 
 # Example Usage
 bucket_name = 'mattydolans3bucket'
-local_file_path = 'companies.parquet' 
+local_file_path = 'company_data.parquet' 
 
 # Check if the request was successful (status code 200)
 if r.status_code == 200:
