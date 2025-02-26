@@ -19,4 +19,4 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Command to run the Python script
-CMD ["python", "matt.py"]
+CMD ["python", "company.py"]
